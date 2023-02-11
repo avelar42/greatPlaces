@@ -16,13 +16,22 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   String? _previewImageUrl;
 
-  Future<void> _getCurrentUserLocation() async {
-    final locData = await Location().getLocation();
-    final staticMapImageUrl = LocationUtil.generateLocationPreviwImage(
-        latitude: locData.latitude, longitude: locData.longitude);
+  void _showPreview(double lat, double lng) {
+    final staticMapImageUrl =
+        LocationUtil.generateLocationPreviwImage(latitude: lat, longitude: lng);
     setState(() {
       _previewImageUrl = staticMapImageUrl;
     });
+  }
+
+  Future<void> _getCurrentUserLocation() async {
+    try {
+      final locData = await Location().getLocation();
+      _showPreview(locData.latitude!, locData.longitude!);
+      widget.onSelectedPosition(LatLng(locData.latitude!, locData.longitude!));
+    } catch (e) {
+      return;
+    }
   }
 
   Future<void> _selectOnMap() async {
@@ -30,8 +39,14 @@ class _LocationInputState extends State<LocationInput> {
         MaterialPageRoute(
             builder: (ctx) => MapScreen(), fullscreenDialog: true));
     if (selectedPosition == null) return;
-    print(selectedPosition.latitude);
-    print(selectedPosition.longitude);
+
+    _showPreview(selectedPosition.latitude, selectedPosition.longitude);
+    final staticMapImageUrl = LocationUtil.generateLocationPreviwImage(
+        latitude: selectedPosition.latitude,
+        longitude: selectedPosition.longitude);
+    setState(() {
+      _previewImageUrl = staticMapImageUrl;
+    });
     widget.onSelectedPosition(selectedPosition);
   }
 

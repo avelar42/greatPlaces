@@ -16,7 +16,10 @@ class GreatPlaces with ChangeNotifier {
         .map((item) => Place(
             id: item['id'],
             title: item['title'],
-            location: null,
+            location: PlaceLocation(
+                latitude: item['latitude'],
+                longitude: item['longitude'],
+                address: item['address']),
             image: File(item['image'])))
         .toList();
     notifyListeners();
@@ -53,7 +56,10 @@ class GreatPlaces with ChangeNotifier {
     DbUtil.insert("places", {
       'id': newPlace.id,
       'title': newPlace.title,
-      'image': newPlace.image.path
+      'image': newPlace.image.path,
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'address': address
     });
     notifyListeners();
   }
